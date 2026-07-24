@@ -1,0 +1,29 @@
+FROM jenkins/jenkins:lts-jdk21
+
+USER root
+
+RUN apt-get update && \
+	apt-get install -y \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release \
+        unzip \
+        git \
+        docker.io && \
+	rm -rf /var/lib/apt/lists/*
+
+RUN ARCH="$(dpkg --print-architecture)" && \
+	case "${ARCH}" in \
+        amd64) TF_ARCH="amd64" ;; \
+        arm64) TF_ARCH="arm64" ;; \
+        *) echo "Unsupported architecture: ${ARCH}" && exit 1 ;; \
+	esac && \
+	TERRAFORM_VERSION="1.15.8" && \
+	curl -fsSLo /tmp/terraform.zip \
+	"https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" && \
+	unzip /tmp/terraform.zip -d /usr/local/bin && \
+	rm /tmp/terraform.zip && \
+	terraform version
+
+USER jenkins
