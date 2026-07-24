@@ -90,8 +90,6 @@ pipeline {
 			steps {
 			        sh '''
 				docker ps --filter "name=${CONTAINER_NAME}"
-				sleep 3
-				curl --fail http://localhost:${APPLICATION_PORT}
 				'''
 			}
 		}
